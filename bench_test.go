@@ -28,6 +28,9 @@ var configs = []struct {
 	},
 }
 
+//var stdout io.Writer = io.Discard
+//var stderr io.Writer = io.Discard
+
 var stdout = os.Stdout
 var stderr = os.Stderr
 

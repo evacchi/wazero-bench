@@ -116,18 +116,18 @@ build.all: build.zig build.tinygo build.gowasip1
 
 .PHONY: build.zig
 build.zig:
-	mkdir -p $(zig_bin)
+	@mkdir -p $(zig_bin)
 	cd $(zigroot) && zig test --test-no-exec -target wasm32-wasi --zig-lib-dir $(zigroot)/lib $(zigroot)/lib/std/std.zig
-	cp $(shell find $(zigroot) -name test.wasm) $(zig_bin)/test.wasm
+	@cp $(shell find $(zigroot) -name test.wasm) $(zig_bin)/test.wasm
 	wasm-opt $(zig_bin)/test.wasm -O --strip-dwarf -o $(zig_bin)/test-opt.wasm
 
 .PHONY: build.tinygo
 build.tinygo:
-	mkdir -p $(tinygo_bin)
-	$(foreach value,$(tinygo_tests),tinygo test -target wasi -c -o ./$(tinygo_bin)/$(subst _,/,$(value)).test $(value);)
+	@mkdir -p $(tinygo_bin)
+	@$(foreach value,$(tinygo_tests),tinygo test -target wasi -c -o ./$(tinygo_bin)/$(subst _,/,$(value)).test $(value);)
 
 .PHONY: build.gowasip1
 build.gowasip1:
-	mkdir -p $(gowasip1_bin)
-	cd $(goroot)
-	$(foreach value,$(gowasip1_tests),GOOS=wasip1 GOARCH=wasm && go test -v -c -o ./$(gowasip1_bin)/$(subst /,_,$(value)).test $(goroot)/$(value);)
+	@mkdir -p $(gowasip1_bin)
+	@cd $(goroot)
+	@$(foreach value,$(gowasip1_tests),GOOS=wasip1 GOARCH=wasm go test -v -c -o ./$(gowasip1_bin)/$(subst /,_,$(value)).test $(goroot)/$(value);)
