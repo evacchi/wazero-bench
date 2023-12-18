@@ -6,7 +6,6 @@ import (
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/experimental/opt"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -28,11 +27,11 @@ var configs = []struct {
 	},
 }
 
-//var stdout = os.Stdout
-//var stderr = os.Stderr
+var stdout = os.Stdout
+var stderr = os.Stderr
 
-var stdout = io.Writer(nil)
-var stderr = io.Writer(nil)
+//var stdout = io.Writer(nil)
+//var stderr = io.Writer(nil)
 
 func BenchmarkZig(b *testing.B) {
 	dir := "testdata/zig/"
