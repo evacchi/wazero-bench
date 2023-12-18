@@ -1,11 +1,17 @@
-goroot=$(shell go env GOROOT)
-# You should override with the zig source code path.
+# Note: Some tests might fail if Go has been installed with homebrew because
+# the file system layout is different than what the tests expect.
+# Easiest fix is to install without using brew.
+goroot?=$(shell go env GOROOT)
+# Note: The standard binary zig distribution does not ship some testdata.
+# You should override with the zig source code path, otherwise some tests will fail.
 zigroot?=$(shell dirname $(shell which zig))
 
-zig_bin=testdata/zig
-tinygo_bin=testdata/tinygo
-gowasip1_bin=testdata/go
+zig_bin=$(shell pwd)/testdata/zig
+tinygo_bin=$(shell pwd)/testdata/tinygo
+gowasip1_bin=$(shell pwd)/testdata/go
 
+
+# embed/internal/embedtest deals with some paths that are not available here, ignore.
 tinygo_tests=container/heap \
 	container/list \
 	container/ring \
@@ -15,7 +21,6 @@ tinygo_tests=container/heap \
 	crypto/sha1 \
 	crypto/sha256 \
 	crypto/sha512 \
-	embed/internal/embedtest \
 	encoding \
 	encoding/ascii85 \
 	encoding/base32 \
@@ -110,7 +115,7 @@ gowasip1_tests=src/archive/tar \
 	src/time
 
 all:
-	echo WIP
+	go test -bench=. -benchtime=1x
 
 build.all: build.zig build.tinygo build.gowasip1
 
@@ -124,10 +129,14 @@ build.zig:
 .PHONY: build.tinygo
 build.tinygo:
 	@mkdir -p $(tinygo_bin)
-	@$(foreach value,$(tinygo_tests),tinygo test -target wasi -c -o ./$(tinygo_bin)/$(subst _,/,$(value)).test $(value);)
+	@for value in $(tinygo_tests); do\
+		tinygo test -target wasi -c -o $(tinygo_bin)/$${value//\//_}.test $${value};\
+	done
 
 .PHONY: build.gowasip1
 build.gowasip1:
 	@mkdir -p $(gowasip1_bin)
-	@cd $(goroot)
-	@$(foreach value,$(gowasip1_tests),GOOS=wasip1 GOARCH=wasm go test -v -c -o ./$(gowasip1_bin)/$(subst /,_,$(value)).test $(goroot)/$(value);)
+	@cd $(goroot); \
+	for value in $(gowasip1_tests);\
+	  	do  GOOS=wasip1 GOARCH=wasm go test -v -c -o $(gowasip1_bin)/$${value//\//_}.test ./$${value}; \
+	done
