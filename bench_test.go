@@ -2,6 +2,7 @@ package wazevo_test
 
 import (
 	"context"
+	"crypto/rand"
 	"github.com/evacchi/wazero-bench/require"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/experimental/opt"
@@ -173,6 +174,7 @@ func defaultModuleConfig() wazero.ModuleConfig {
 		WithSysNanosleep().
 		WithSysNanotime().
 		WithSysWalltime().
+		WithRandSource(rand.Reader).
 		WithStdout(stdout).
 		WithStderr(stderr)
 }
